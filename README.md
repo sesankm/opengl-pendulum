@@ -1,3 +1,9 @@
 #opengl-pendulum
 ---
-- a simple simulation of periodic motion 
+- simulation of a pendulum
+- Building/Running:
+```
+make
+./pend
+```
+- dependencies: opengl
