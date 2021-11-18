@@ -45,11 +45,46 @@ void drawArm(){
 	glEnd();
 }
 
+
+float slider_x = -8;
+float slider_width = 7;
+
+float knob_x = -2;
+float knob_width = 1;
+
+void drawSlider(){
+	glColor3f(.2, .2, .2);
+	glBegin(GL_QUADS);
+	glVertex2f(slider_x, -3);
+	glVertex2f(slider_x + slider_width, -3);
+	glVertex2f(slider_x + slider_width, -2.5);
+	glVertex2f(slider_x, -2.5);
+	glEnd();
+
+	glColor3f(.6, .2, .2);
+	glBegin(GL_QUADS);
+	glVertex2f(knob_x, -3);
+	glVertex2f(knob_x + 1, -3);
+	glVertex2f(knob_x + 1, -2.5);
+	glVertex2f(knob_x, -2.5);
+	glEnd();
+	glColor3f(.8, .8, .8);
+}
+
 void render_func(){
 	glClear(GL_COLOR_BUFFER_BIT);
 	glLoadIdentity();
 	drawBob();
 	drawArm();
+	drawSlider();
+
+	char* string = "Gravity";
+	glRasterPos3f(slider_x + slider_width + .5, -2.85, 0);
+	for (char* c = string; *c != '\0'; c++) {
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *c);
+	}
+
+
 	glutSwapBuffers();
 }
 
@@ -74,10 +109,29 @@ void clock(){
 }
 
 void mouse_click(int button, int state, int x, int y){
-	if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+	glMatrixMode(GL_PROJECTION);
+
+	float px = (x * 20) / SCREEN_WIDTH + (-10);
+	float py = (SCREEN_HEIGHT - y) * (20) / SCREEN_HEIGHT + (-10);
+
+	if(px >= slider_x && px <= slider_x + slider_width && py <= -2.5 && py >= -3){
+		float dist = px - knob_x;
+		if(knob_x + dist <= slider_x)
+			knob_x = slider_x;
+		else if(knob_x + dist >= slider_x + slider_width)
+			knob_x = slider_x - knob_width;
+		else
+			knob_x += dist;
+		f_gravity = -.98 * (1 - ((slider_x + slider_width - knob_width - knob_x) / slider_width));
+	}
+
+	else if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
 		angle = 57 * atan((x - ((float) SCREEN_WIDTH / 2)) / y);
 	glutPostRedisplay();
+	glMatrixMode(GL_MODELVIEW);
 }
+
+/* void mouse_ */
 
 
 int main(int argc, char **argv) {
